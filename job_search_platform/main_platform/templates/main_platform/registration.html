@@ -1,0 +1,53 @@
+{% extends 'main_platform/base.html' %}
+
+{% block content %}
+    {% load static %}
+    <section class="hero is-link is-fullheight">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+                        <form class="box" action="{% url 'main_platform:registration' %}" method="post">
+                            {% csrf_token %}
+                            <div class="field">
+                                <label class="label">Nom d'utilisateur</label>
+                                {{ form.username }}
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Email</label>
+                                {{ form.email }}
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Mot de passe</label>
+                                {{ form.password }}
+                            </div>
+
+                            <div class="field">
+                                <div class="control">
+                                    <label class="checkbox">
+                                        <input type="checkbox" id="id_checkbox">
+                                        J'accepte les <a href="#">conditions générales d'utilisation</a>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="field is-grouped">
+                                <div class="control">
+                                    <button class="button is-link" id="id_submit">Inscription</button>
+                                </div>
+                                <div class="control">
+                                    <button type="reset" class="button is-link is-light">Réinitialiser</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="text/javascript" src="{% static 'main_platform/js/addressInput.js' %}"></script>
+
+
+{% endblock %}

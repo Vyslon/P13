@@ -1,0 +1,319 @@
+{% extends 'main_platform/base.html' %}
+
+{% block content %}
+    {% load static %}
+    {% load mathfilters %}
+
+    <section class="hero is-link is-fullheight">
+        <div class="section" style="padding: 10px 2px">
+            <div class="container">
+                <h1 id="titleSavedCompanies">Recherche d'entreprise</h1>
+                <div class="columns is-centered">
+                    <div class="column is-12-tablet is-12-desktop is-12-widescreen">
+                        <div class="table-container is-flex-wrap-wrap">
+
+                            <h2 id="selectedJobsTitle">Intitulés métier actuel : </h2>
+                            <p class="selectedJobs">
+                                {% for job in jobs %}
+                                    {{ job.job_name }}
+                                    <br/>
+                                {% endfor %}
+                                <a href="{% url 'main_platform:account' %}">. . .</a>
+                            </p>
+                            <hr style="background-color: black"/>
+                            <label>Distance Maximum : </label>
+                            <input type="text" id="dMax" name="dMax">
+                            <table class="table is-striped" id="table_id">
+                                <thead>
+                                <tr>
+                                    <th>Sauvegarder</th>
+                                    <th>Distance<br/>(en Km)</th>
+                                    <th>Secteur d'activité</th>
+                                    <th>Nom</th>
+                                    <th>Taille de l'entreprise</th>
+                                    <th>Mode de contact</th>
+                                    <th>Alternance</th>
+                                    <th>Potentiel d'embauche</th>
+                                </tr>
+                                <tbody>
+                                {% for company in companies %}
+                                    <tr>
+                                        {% if company.siret in savedCompanies %}
+                                            <td>
+                                <span class="icon is-large">
+                                    <i class="fas fa-check" style="display: block;margin-left:100%"></i>
+                                </span>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <form action="{% url 'main_platform:searchCompany' %}" method="post"
+                                                      accept-charset="utf-8"
+                                                      style="display: block;padding-top: 15%;padding-left: 40%">
+                                                    {% csrf_token %}
+                                                    <input type="checkbox" class="save">
+                                                    <input type="hidden" id="name" name="name"
+                                                           value="{{ company.name }}">
+                                                    <input type="hidden" id="headcount_text" name="headcount_text"
+                                                           value="{{ company.headcount_text }}">
+                                                    <input type="hidden" id="contact_mode" name="contact_mode"
+                                                           value="{{ company.contact_mode }}">
+                                                    <input type="hidden" id="url" name="url" value="{{ company.url }}">
+                                                    <input type="hidden" id="alternance" name="alternance"
+                                                           value="{{ company.alternance }}">
+                                                    <input type="hidden" id="siret" name="siret"
+                                                           value="{{ company.siret }}">
+                                                </form>
+                                                <span class="icon is-large is-hidden">
+                                    <i class="fas fa-check" style="display: block;margin-left:100%"></i>
+                                </span>
+                                            </td>
+                                        {% endif %}
+
+                                        <td>
+                                            {{ company.distance }}
+                                        </td>
+                                        <td>
+                                            {{ company.naf_text }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ company.url }}" class="button is-primary is-light"
+                                               target="_blank">{{ company.name }}</a>
+                                        </td>
+                                        <td>
+                                            {{ company.headcount_text }}
+                                        </td>
+                                        <td>
+                                            {{ company.contact_mode }}
+                                        </td>
+                                        <td>
+                                            {% if company.alternance %}
+                                                Oui
+                                            {% else %}
+                                                Non
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ company.stars }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="{% static 'main_platform/js/ajaxSave.js' %}"></script>
+    <script>
+        /* Custom filtering function which will search data in column four between two values */
+        $.fn.dataTable.ext.search.push(
+            function (settings, data, dataIndex) {
+                var dMax = parseFloat($('#dMax').val().replace(',', '.'), 10);
+                var distance = parseFloat(data[1].replace(',', '.')) || 0; // use data for the age column
+
+                if (distance <= dMax || isNaN(dMax)) {
+                    return true;
+                }
+                return false;
+            }
+        );
+
+        $(document).ready(function () {
+            var table = $('#table_id').DataTable({
+                "language": {
+                    "emptyTable": "Aucune entreprise trouvée",
+                    "lengthMenu": "Afficher _MENU_ éléments",
+                    "loadingRecords": "Chargement...",
+                    "processing": "Traitement...",
+                    "zeroRecords": "Aucun élément correspondant trouvé",
+                    "paginate": {
+                        "first": "Premier",
+                        "last": "Dernier",
+                        "previous": "Précédent",
+                        "next": "Suivant"
+                    },
+                    "aria": {
+                        "sortAscending": ": activer pour trier la colonne par ordre croissant",
+                        "sortDescending": ": activer pour trier la colonne par ordre décroissant"
+                    },
+                    "select": {
+                        "rows": {
+                            "_": "%d lignes sélectionnées",
+                            "0": "Aucune ligne sélectionnée",
+                            "1": "1 ligne sélectionnée"
+                        },
+                        "1": "1 ligne selectionnée",
+                        "_": "%d lignes selectionnées",
+                        "cells": {
+                            "1": "1 cellule sélectionnée",
+                            "_": "%d cellules sélectionnées"
+                        },
+                        "columns": {
+                            "1": "1 colonne sélectionnée",
+                            "_": "%d colonnes sélectionnées"
+                        }
+                    },
+                    "autoFill": {
+                        "cancel": "Annuler",
+                        "fill": "Remplir toutes les cellules avec <i>%d<\/i>",
+                        "fillHorizontal": "Remplir les cellules horizontalement",
+                        "fillVertical": "Remplir les cellules verticalement",
+                        "info": "Exemple de remplissage automatique"
+                    },
+                    "searchBuilder": {
+                        "conditions": {
+                            "date": {
+                                "after": "Après le",
+                                "before": "Avant le",
+                                "between": "Entre",
+                                "empty": "Vide",
+                                "equals": "Egal à",
+                                "not": "Différent de",
+                                "notBetween": "Pas entre",
+                                "notEmpty": "Non vide"
+                            },
+                            "number": {
+                                "between": "Entre",
+                                "empty": "Vide",
+                                "equals": "Egal à",
+                                "gt": "Supérieur à",
+                                "gte": "Supérieur ou égal à",
+                                "lt": "Inférieur à",
+                                "lte": "Inférieur ou égal à",
+                                "not": "Différent de",
+                                "notBetween": "Pas entre",
+                                "notEmpty": "Non vide"
+                            },
+                            "string": {
+                                "contains": "Contient",
+                                "empty": "Vide",
+                                "endsWith": "Se termine par",
+                                "equals": "Egal à",
+                                "not": "Différent de",
+                                "notEmpty": "Non vide",
+                                "startsWith": "Commence par"
+                            },
+                            "array": {
+                                "equals": "Egal à",
+                                "empty": "Vide",
+                                "contains": "Contient",
+                                "not": "Différent de",
+                                "notEmpty": "Non vide",
+                                "without": "Sans"
+                            }
+                        },
+                        "add": "Ajouter une condition",
+                        "button": {
+                            "0": "Recherche avancée",
+                            "_": "Recherche avancée (%d)"
+                        },
+                        "clearAll": "Effacer tout",
+                        "condition": "Condition",
+                        "data": "Donnée",
+                        "deleteTitle": "Supprimer la règle de filtrage",
+                        "logicAnd": "Et",
+                        "logicOr": "Ou",
+                        "title": {
+                            "0": "Recherche avancée",
+                            "_": "Recherche avancée (%d)"
+                        },
+                        "value": "Valeur"
+                    },
+                    "searchPanes": {
+                        "clearMessage": "Effacer tout",
+                        "count": "{total}",
+                        "title": "Filtres actifs - %d",
+                        "collapse": {
+                            "0": "Volet de recherche",
+                            "_": "Volet de recherche (%d)"
+                        },
+                        "countFiltered": "{shown} ({total})",
+                        "emptyPanes": "Pas de volet de recherche",
+                        "loadMessage": "Chargement du volet de recherche..."
+                    },
+                    "buttons": {
+                        "copyKeys": "Appuyer sur ctrl ou u2318 + C pour copier les données du tableau dans votre presse-papier.",
+                        "collection": "Collection",
+                        "colvis": "Visibilité colonnes",
+                        "colvisRestore": "Rétablir visibilité",
+                        "copy": "Copier",
+                        "copySuccess": {
+                            "1": "1 ligne copiée dans le presse-papier",
+                            "_": "%ds lignes copiées dans le presse-papier"
+                        },
+                        "copyTitle": "Copier dans le presse-papier",
+                        "csv": "CSV",
+                        "excel": "Excel",
+                        "pageLength": {
+                            "-1": "Afficher toutes les lignes",
+                            "1": "Afficher 1 ligne",
+                            "_": "Afficher %d lignes"
+                        },
+                        "pdf": "PDF",
+                        "print": "Imprimer"
+                    },
+                    "decimal": ",",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ éléments",
+                    "infoEmpty": "Affichage de 0 à 0 sur 0 éléments",
+                    "infoThousands": ".",
+                    "search": "Rechercher:",
+                    "searchPlaceholder": "...",
+                    "thousands": ".",
+                    "infoFiltered": "(filtrés depuis un total de _MAX_ éléments)",
+                    "datetime": {
+                        "previous": "Précédent",
+                        "next": "Suivant",
+                        "hours": "Heures",
+                        "minutes": "Minutes",
+                        "seconds": "Secondes",
+                        "unknown": "-",
+                        "amPm": [
+                            "am",
+                            "pm"
+                        ]
+                    },
+                    "editor": {
+                        "close": "Fermer",
+                        "create": {
+                            "button": "Nouveaux",
+                            "title": "Créer une nouvelle entrée",
+                            "submit": "Envoyer"
+                        },
+                        "edit": {
+                            "button": "Editer",
+                            "title": "Editer Entrée",
+                            "submit": "Modifier"
+                        },
+                        "remove": {
+                            "button": "Supprimer",
+                            "title": "Supprimer",
+                            "submit": "Supprimer"
+                        },
+                        "error": {
+                            "system": "Une erreur système s'est produite"
+                        },
+                        "multi": {
+                            "title": "Valeurs Multiples",
+                            "restore": "Rétablir Modification"
+                        }
+                    }
+                },
+                "aoColumnDefs": [
+                    {'bSortable': false, 'aTargets': [0, 4]}
+                ],
+                "order": [[0, ''], [1, 'asc']]
+            });
+
+            // Event listener to the two range filtering inputs to redraw on input
+            $('#dMax').keyup(function () {
+                table.draw();
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'main_platform/base.html' %}
+
+{% block content %}
+    {% load static %}
+
+
+    <section class="hero is-link is-fullheight">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-8-tablet is-8-desktop is-8-widescreen">
+                        <form class="box" action="{% url 'main_platform:choseJob' %}" method="get">
+                            <div class="field has-addons">
+                                <div class="control is-expanded">
+                                    <input class="input" type="text" name="name" placeholder="Nom du métier">
+                                    <p class="help">Recherchez le métier de votre choix puis cliquez simplement dessus,
+                                        il vous sera attribué, vous pourrez consulter votre métier actuellement
+                                        recherché sur la page
+                                        "Mon Compte"</p>
+                                </div>
+                                <div class="control">
+                                    <button class="button is-info" type="submit">Chercher</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="table-container is-flex-wrap-wrap">
+                            <table class="table is-striped">
+                                <tbody>
+                                {% if jobs %}
+                                    {% for job in jobs %}
+                                        <tr>
+                                            <td>
+                                                <a href="/main/chosedJob/?code={{ job.job_code.code }}">{{ job.job_name }}</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td>
+                                            Aucun métier commençant par : "{{ search }}"
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+{% endblock %}

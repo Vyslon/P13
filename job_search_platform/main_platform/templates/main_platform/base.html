@@ -1,0 +1,77 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jSearch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+          integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+          crossorigin="anonymous"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="{% static 'main_platform/css/dataTableStyle.css' %}">
+    {% comment %}<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCe7pJOFOImu2A7ZegTXmT420oSmckuSRslibraries=places"></script>{% endcomment %}
+
+
+<body>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="{% url 'main_platform:index' %}">
+            <h1>Job Search Platform</h1>
+        </a>
+    </div>
+
+    {% if request.user.is_authenticated %}
+        {% if hasChosedJob and hasAddress %}
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <a class="button is-link" href="{% url 'main_platform:searchCompany' %}">
+                        Rechercher une entreprise
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <a class="button is-primary" id="id_savedCompanies" style="padding-right: 5px" href="{% url 'main_platform:savedCompanies' %}">
+                    Entreprises sauvegardées
+                </a>
+            </div>
+        </div>
+
+        <div class="navbar-start">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <form action="{% url 'main_platform:choseJob' %}" method="get">
+                        <div class="field has-addons">
+                            <div class="control">
+                                <input class="input" type="text" name="name" placeholder="Nom du métier"
+                                       id="íd_jobwanted">
+                            </div>
+                            <div class="control">
+                                <button class="button is-info" style="margin-right: 8px" type="submit"
+                                        id="id_jobwantedsubmit">Changer le métier recherché
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="navbar-item">
+                <a class="button is-primary" href="{% url 'main_platform:account' %}">
+                    Mon compte
+                </a>
+            <div class="navbar-item">
+                <a class="button is-danger navbar-start" id="id_logout" href="{% url 'logout' %}">
+                    Déconnexion
+                </a>
+            </div>
+        </div>
+    {% endif %}
+    </div>
+</nav>
+{% block content %}{% endblock %}
+</body>
+</html>

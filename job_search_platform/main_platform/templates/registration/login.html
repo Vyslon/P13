@@ -1,0 +1,55 @@
+{% extends 'main_platform/base.html' %}
+
+{% block content %}
+    {% load static %}
+    <section class="hero is-link is-fullheight">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        <form class="box" action="{% url 'login' %}" method="post">
+                            {% csrf_token %}
+                            <div class="field">
+                                <p class="control has-icons-left has-icons-right">
+                                    <label for="{{ form.username.id_for_label }}" class="control-label">Nom
+                                        d'utilisateur</label>
+                                    {{ form.username }}
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control has-icons-left">
+                                    <label for="{{ form.password.id_for_label }}" class="control-label">Mot de
+                                        passe</label>
+                                    {{ form.password }}
+                                </p>
+                            </div>
+
+                            <div class="field">
+                                <p style="display:inline;" class="control">
+                                    <button class="button is-success">
+                                        Se connecter
+                                    </button>
+                                </p>
+
+                            </div>
+                        </form>
+
+                        <a href="{% url 'main_platform:registrationPage' %}">
+                            <button class="button is-info">
+                                Vous n'avez pas encore de compte ?
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'main_platform/base.html' %}
+
+{% block content %}
+    {% load static %}
+
+    <script type="text/javascript" src="{% static 'main_platform/js/addressInput.js' %}"></script>
+
+    <section class="hero is-link is-fullheight">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-10-tablet is-8-desktop is-10-widescreen">
+                        <div class="box has-text-primary-dark has-background-grey-darker">
+                            <div class="is-size-3 ">
+
+                                Nom d'utilisateur <span class="has-text-light">| {{ pseudo }}</span>
+                                <br/>
+                                E-mail <span class="has-text-light">| {{ email }}</span>
+                                <br/>
+                                Adresse sauvegardée <span class="has-text-light">| {{ address }}</span>
+                                <form class="box" action="{% url 'main_platform:updateAddress' %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="field has-text-light">
+                                        <div class="control">
+                                            <span class="form-label">Adresse</span>
+                                            <input
+                                                    id="addressInput"
+                                                    name="addressInput"
+                                                    required
+                                                    autocomplete="off"
+                                            />
+                                            <input id="latitude" name="latitude" type="hidden" value="">
+                                            <input id="longitude" name="longitude" type="hidden" value="">
+                                        </div>
+                                        <div>
+                                            <button class="button is-link" id="changeAddress">Modifier</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                {% if jobs %}
+                                    Intitulés métier actuel :
+                                    <br/>
+                                    <span class="has-text-light">
+                            {% for job in jobs %}
+                                {{ job.job_name }}
+                                <br/>
+                            {% endfor %}
+                            </span>
+                                {% endif %}
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="text/javascript" src="{% static 'main_platform/js/addressInput.js' %}"></script>
+    <script
+            src="https://maps.googleapis.com/maps/api/js?key=YOUAPIKEY&callback=initAutocomplete&libraries=places&v=weekly"
+            async
+    ></script>
+
+
+{% endblock %}
