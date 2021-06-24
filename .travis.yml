@@ -7,7 +7,7 @@ before_script:
 
 branches:
   only:
-    - prod
+    - new
 
 env: DJANGO_SETTINGS_MODULE="job_search_platform.settings.travis"
 
